@@ -36,6 +36,27 @@ export default function Home() {
             I ship agentic systems as production software—async-first, high-concurrency, and built to survive beyond the handoff. 7+ years bridging LLMs, real-time voice, and generative video.
           </p>
 
+           <a
+             href="https://www.toptal.com/developers/resume/abu-bakar-ilyas#gzgEbW"
+             target="_blank"
+             rel="noreferrer"
+             aria-label="View Abu Bakar Ilyas on Toptal"
+             className="group mb-8 flex w-full max-w-[320px] items-center gap-4 border-2 border-[#204ecf] bg-[radial-gradient(circle_at_top_left,#dff8ff_0%,#ffffff_52%,#eef2ff_100%)] p-4 shadow-[5px_5px_0px_0px_#25a9ef] transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#204ecf]"
+           >
+             <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-[#25a9ef] text-xl font-black text-white [clip-path:polygon(50%_0,100%_24%,100%_76%,50%_100%,0_76%,0_24%)]">
+               3%
+             </span>
+             <span className="min-w-0">
+               <span className="block font-mono text-xs font-bold tracking-[0.18em] text-[#204ecf]">
+                 TOP 3% TALENT
+               </span>
+               <span className="mt-1 block text-sm font-medium text-[#262d3d]">
+                 Vetted by <strong>Toptal</strong>
+               </span>
+             </span>
+             <ExternalLink className="ml-auto h-4 w-4 shrink-0 text-[#204ecf] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+           </a>
+
           <div className="flex flex-col gap-3 font-mono text-sm mt-8">
             <a href="mailto:abubakarilyas624@gmail.com" className="flex items-center gap-3 text-secondary-foreground hover:text-foreground transition-colors w-fit group">
               <span className="p-2 bg-card border border-border group-hover:border-foreground group-hover:bg-foreground group-hover:text-background transition-colors"><Mail className="w-4 h-4" /></span>
