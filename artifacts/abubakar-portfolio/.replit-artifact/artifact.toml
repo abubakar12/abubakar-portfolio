@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Muhammad Abu Bakar — AI Engineer"
+description = "A polished personal portfolio presenting Muhammad Abu Bakar's AI engineering leadership, production agentic systems, career experience, achievements, education, and technical expertise."
+version = "1.0.0"
+id = "artifacts/abubakar-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19475
+
+[services.development]
+run = "pnpm --filter @workspace/abubakar-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/abubakar-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/abubakar-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19475"
+BASE_PATH = "/"
