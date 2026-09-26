@@ -1,311 +1,256 @@
-import { motion } from "framer-motion";
-import { ExternalLink, Github, Linkedin, Mail, MapPin, Phone, Download } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Download, Menu, X } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import profilePic from "@assets/0_IMG_20250526_183014_1789733453748.jpg";
 import cvPdf from "@assets/0_ai_engineer_1789733068372.pdf";
-import { ReactNode } from "react";
 
-const STAGGER_DELAY = 0.1;
+const email = "mailto:abubakarilyas624@gmail.com";
+const linkedIn = "https://linkedin.com/in/abu-bakar-ilyas-72b261113/";
+const github = "https://github.com/abubakar12";
+const toptal = "https://www.toptal.com/developers/resume/abu-bakar-ilyas#gzgEbW";
+
+const navigation = [
+  { label: "Profile", href: "#profile" },
+  { label: "Industries", href: "#industries" },
+  { label: "Career", href: "#career" },
+  { label: "Capabilities", href: "#capabilities" },
+  { label: "Credentials", href: "#credentials" },
+  { label: "Contact", href: "#contact" },
+];
+
+const domains = [
+  { title: "Banking & insurance", copy: "Architected and shipped an agentic RAG compliance expert system with specialized LLMs, deployed in production for major U.S. banking and insurance customers.", context: "360factors" },
+  { title: "Hospitality", copy: "Built Elsa, a full-duplex in-cabin voice assistant for high-end cruise ships, with streaming conversation, interruption recovery and voice-driven screen control.", context: "TwinCiti" },
+  { title: "Advertising & e-commerce", copy: "Built agent-led ad generation workflows and a containerized pipeline that turns a concept into a complete ad video.", context: "Resilia" },
+  { title: "Call-center operations", copy: "Migrated a core ML pipeline from R to Python and overhauled graph-based call-center pairing with automated grid search and fold-wise validation.", context: "Afiniti" },
+  { title: "FMCG & demand", copy: "Led demand forecasting pipelines for Friesland Campina's Olpers and Tarang, improving accuracy by 30%, and for Arcelik across 400+ items.", context: "TheAiSystems" },
+  { title: "Retail inventory", copy: "Designed a daily forecasting pipeline for Medusa's 8,000 vape products using tree-based and GLM ensembles, reducing stockouts by more than 50%.", context: "TheAiSystems" },
+];
+
+const career = [
+  {
+    company: "360factors", role: "Principal AI Engineer", period: "Oct 2024 – Present", location: "USA · Remote",
+    summary: "Production agentic AI for regulated banking and insurance environments.",
+    details: [
+      "Led a senior multidisciplinary team of 6–7 and partnered directly with the CTO from vision to production.",
+      "Architected and shipped an agentic RAG compliance expert system with specialized LLMs for major U.S. banking and insurance customers.",
+      "Fine-tuned a Llama-3 agent for reliable natural-language-to-SQL with hallucination guardrails and integrated Microsoft Fabric for conversational data exploration.",
+      "Owned containerized training and inference, CI/CD and MLflow monitoring end to end.",
+    ],
+  },
+  {
+    company: "Resilia", role: "Principal AI Engineer / Consultant", period: "Jan 2026 – Jun 2026", location: "Remote",
+    summary: "Agent-led advertising workflows, reusable MCP tools and generative video pipelines.",
+    details: [
+      "Built an automated ad-generation system where agents own end-to-end workflows; fine-tuned an LLM with reinforcement learning as a self-verifying harness.",
+      "Designed reusable skills and MCP tools for a fleet of frontier coding agents.",
+      "Engineered an automated, containerized pipeline generating complete ad videos from a concept.",
+    ],
+  },
+  {
+    company: "TwinCiti", role: "Senior AI Engineer", period: "Mar 2024 – Feb 2025", location: "Remote",
+    summary: "Real-time conversational voice and hands-free in-cabin experiences.",
+    details: [
+      "Built Elsa, a full-duplex voice assistant deployed in-cabin on high-end cruise ships, engineering the streaming voice loop with interruption recovery.",
+      "Extended voice AI into agentic screen control, resolving spoken intent into grounded on-screen execution.",
+      "Built multi-step agentic search over web lookups and personal itinerary context.",
+    ],
+  },
+  {
+    company: "Afiniti Software Solutions", role: "Data Scientist", period: "Nov 2022 – Mar 2024", location: "USA · Remote",
+    summary: "Multi-agent automation and machine-learning infrastructure for call-center pairing.",
+    details: [
+      "Built autonomous multi-agent systems with Microsoft AutoGen and dynamic sub-agent instantiation for news retrieval and GUI automation.",
+      "Led migration of Afiniti's core ML pipeline from R to Python and overhauled graph-based call-center pairing with automated grid search and fold-wise validation.",
+      "Received the Afiniti Rising Star Award.",
+    ],
+  },
+  {
+    company: "TheAiSystems", role: "Senior Data Scientist", period: "Aug 2019 – Nov 2022", location: "Karachi, Pakistan",
+    summary: "Forecasting for retail inventory, FMCG and consumer products.",
+    details: [
+      "Designed a daily forecasting pipeline for Medusa's 8,000 vape products, reducing stockouts by more than 50% using tree-based and GLM ensembles.",
+      "Led demand forecasting for Friesland Campina's Olpers and Tarang, improving accuracy by 30%, and for Arcelik across 400+ items.",
+    ],
+  },
+];
+
+const capabilities = [
+  { title: "Agentic systems", copy: "Multi-agent workflows, agentic RAG, MCP tool servers and self-verifying evaluations." },
+  { title: "LLMs & applied AI", copy: "Fine-tuning with LoRA and QLoRA, Llama-3, Qwen, GPT and natural-language-to-SQL." },
+  { title: "Voice & generative media", copy: "Streaming voice loops, full-duplex interaction, screen control and automated ad-video pipelines." },
+  { title: "Production engineering", copy: "Python, SQL, TypeScript and C++; AWS, Azure, Docker, Kubernetes, MLflow and Airflow." },
+];
+
+function SectionHeading({ number, label, title, id }: { number: string; label: string; title: React.ReactNode; id: string }) {
+  return (
+    <div className="section-header" id={id}>
+      <div className="section-index eyebrow"><span>{number}</span><i aria-hidden="true" /><span>{label}</span></div>
+      <h2 className="display section-title">{title}</h2>
+    </div>
+  );
+}
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row max-w-7xl mx-auto">
-      {/* Left Sidebar */}
-      <motion.aside
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full md:w-[400px] lg:w-[480px] p-6 md:p-12 md:sticky md:top-0 md:h-screen md:overflow-y-auto flex flex-col justify-between shrink-0 no-scrollbar"
-      >
-        <div>
-          <div className="relative mb-8 w-32 h-32 md:w-48 md:h-48 rounded-none overflow-hidden border-2 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--primary))] bg-background">
-            <img
-              src={profilePic}
-              alt="Muhammad Abu Bakar"
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              style={{ objectPosition: '50% 15%' }}
-            />
-          </div>
-
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2">
-            Muhammad Abu Bakar
-          </h1>
-          <h2 className="text-xl md:text-2xl text-primary font-medium mb-4 font-mono">
-            Principal AI Engineer
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base leading-relaxed mb-6">
-            I ship agentic systems as production software—async-first, high-concurrency, and built to survive beyond the handoff. 7+ years bridging LLMs, real-time voice, and generative video.
-          </p>
-
-           <a
-             href="https://www.toptal.com/developers/resume/abu-bakar-ilyas#gzgEbW"
-             target="_blank"
-             rel="noreferrer"
-             aria-label="View Abu Bakar Ilyas on Toptal"
-             className="group mb-8 flex w-full max-w-[320px] items-center gap-4 border-2 border-[#204ecf] bg-[radial-gradient(circle_at_top_left,#dff8ff_0%,#ffffff_52%,#eef2ff_100%)] p-4 shadow-[5px_5px_0px_0px_#25a9ef] transition-all hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#204ecf]"
-           >
-             <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-[#25a9ef] text-xl font-black text-white [clip-path:polygon(50%_0,100%_24%,100%_76%,50%_100%,0_76%,0_24%)]">
-               3%
-             </span>
-             <span className="min-w-0">
-               <span className="block font-mono text-xs font-bold tracking-[0.18em] text-[#204ecf]">
-                 TOP 3% TALENT
-               </span>
-               <span className="mt-1 block text-sm font-medium text-[#262d3d]">
-                 Vetted by <strong>Toptal</strong>
-               </span>
-             </span>
-             <ExternalLink className="ml-auto h-4 w-4 shrink-0 text-[#204ecf] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-           </a>
-
-          <div className="flex flex-col gap-3 font-mono text-sm mt-8">
-            <a href="mailto:abubakarilyas624@gmail.com" className="flex items-center gap-3 text-secondary-foreground hover:text-foreground transition-colors w-fit group">
-              <span className="p-2 bg-card border border-border group-hover:border-foreground group-hover:bg-foreground group-hover:text-background transition-colors"><Mail className="w-4 h-4" /></span>
-              abubakarilyas624@gmail.com
-            </a>
-            <a href="https://linkedin.com/in/abu-bakar-ilyas-72b261113/" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-secondary-foreground hover:text-foreground transition-colors w-fit group">
-              <span className="p-2 bg-card border border-border group-hover:border-foreground group-hover:bg-foreground group-hover:text-background transition-colors"><Linkedin className="w-4 h-4" /></span>
-              LinkedIn Profile
-            </a>
-            <a href="https://github.com/abubakar12" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-secondary-foreground hover:text-foreground transition-colors w-fit group">
-              <span className="p-2 bg-card border border-border group-hover:border-foreground group-hover:bg-foreground group-hover:text-background transition-colors"><Github className="w-4 h-4" /></span>
-              github.com/abubakar12
-            </a>
-            <span className="flex items-center gap-3 text-secondary-foreground w-fit group">
-              <span className="p-2 bg-card border border-border"><Phone className="w-4 h-4" /></span>
-              +92-349-1254752
-            </span>
-            <span className="flex items-center gap-3 text-secondary-foreground w-fit group">
-              <span className="p-2 bg-card border border-border"><MapPin className="w-4 h-4" /></span>
-              Karachi, Pakistan
-            </span>
+    <div className="portfolio">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:left-4 focus:top-4 focus:bg-primary focus:text-background focus:p-3">Skip to content</a>
+      <header className="site-header">
+        <div className="site-wrap header-main">
+          <a href="#top" className="brand" data-testid="link-home"><span className="brand-dot">•</span> Muhammad Abu Bakar</a>
+          <nav className="header-center" aria-label="Primary">
+            <a className="active" href="#profile">Profile</a>
+            <a href="#industries">Experience</a>
+            <a href="#capabilities">Expertise</a>
+          </nav>
+          <div className="header-actions">
+            <a className="hire-link" href={email} data-testid="link-hire">Get in touch <ArrowUpRight size={13} strokeWidth={1.6} /></a>
+            <button type="button" className="mobile-menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)} data-testid="button-mobile-menu">
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
-
-        <div className="mt-12 md:mt-0 pb-8 md:pb-0">
-          <a
-            href={cvPdf}
-            download
-            className="group inline-flex items-center justify-center gap-3 bg-foreground text-background px-6 py-4 font-mono font-bold text-sm hover:bg-primary transition-colors w-full md:w-auto border-2 border-transparent hover:border-foreground hover:shadow-[4px_4px_0px_0px_hsl(var(--foreground))]"
-          >
-            <Download className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
-            DOWNLOAD_RESUME.PDF
-          </a>
-        </div>
-      </motion.aside>
-
-      {/* Right Content */}
-      <main className="w-full flex-1 px-6 md:px-12 py-12 md:py-24 flex flex-col gap-24">
-        {/* Experience Section */}
-        <Section title="EXPERIENCE" delay={0.2}>
-          <div className="flex flex-col gap-16">
-            
-            <ExperienceItem
-              company="The 360factors"
-              role="Principal AI Engineer"
-              date="Oct 2024 – Present"
-              location="USA (Remote)"
-              highlights={[
-                "Led a senior, multidisciplinary team of 6–7. Held the enterprise quality bar, partnering directly with CTO from vision to production.",
-                "Architected and shipped an agentic RAG compliance expert system with specialized LLMs. Deployed in production for major U.S. banking and insurance customers.",
-                "Fine-tuned a Llama-3 agent for reliable NL→SQL with strict hallucination guardrails. Integrated Microsoft Fabric for conversational data exploration.",
-                "Owned products end-to-end: containerized training/inference, CI/CD, MLflow monitoring, operating without handoff."
-              ]}
-            />
-
-            <ExperienceItem
-              company="Resilia"
-              role="Principal AI Engineer/Consultant"
-              date="Jan 2026 – June 2026"
-              location="Remote"
-              highlights={[
-                "Built an automated ad-generation system where agents own end-to-end workflows. Fine-tuned an LLM with RL as a self-verifying harness that auto-promotes scaling ads.",
-                "Designed reusable skills and MCP tools enabling a lean team + agents to deliver at multiples of its size across a fleet of frontier coding agents.",
-                "Engineered a fully automated, containerized pipeline generating complete ad videos from concept alone, surpassing leading tools like Higgsfield."
-              ]}
-            />
-
-            <ExperienceItem
-              company="TwinCiti"
-              role="Senior AI Engineer"
-              date="Mar 2024 – Feb 2025"
-              location="Remote"
-              highlights={[
-                "Built 'Elsa', a full-duplex voice assistant deployed in-cabin on high-end cruise ships. Engineered the streaming voice loop end-to-end under conversational latency with interruption recovery.",
-                "Pushed voice AI into agentic screen control: spoken intent resolved into grounded on-screen execution for hands-free navigation.",
-                "Built multi-step agentic search that executes web lookups against personal itinerary context as a pluggable platform."
-              ]}
-            />
-
-            <ExperienceItem
-              company="Afiniti Software Solutions"
-              role="Data Scientist"
-              date="Nov 2022 – Mar 2024"
-              location="USA (Remote)"
-              highlights={[
-                "Built autonomous multi-agent systems using Microsoft AutoGen with dynamic sub-agent instantiation for news retrieval and GUI automation (OmniParser + Qwen).",
-                "Led migration of Afiniti’s core ML pipeline from R to Python. Overhauled graph-based call-center pairing with automated grid search and fold-wise validation. (Rising Star Award)"
-              ]}
-            />
-
-            <ExperienceItem
-              company="TheAiSystems"
-              role="Senior Data Scientist"
-              date="Aug 2019 – Nov 2022"
-              location="Karachi, Pakistan"
-              highlights={[
-                "Designed end-to-end pipeline to predict Medusa’s 8000 vape products daily, reducing stockouts by >50% via Tree-based and GLM ensembles.",
-                "Led demand forecasting pipelines for Friesland Campina (Olpers/Tarang) increasing accuracy by 30%, and Arcelik across 400+ items."
-              ]}
-            />
-
+        <nav className="header-sub" aria-label="Page sections">
+          <div className="site-wrap header-sub-inner">
+            {navigation.map((item) => <a key={item.href} href={item.href} data-testid={`link-nav-${item.label.toLowerCase()}`}>{item.label}</a>)}
+            <a href={cvPdf} download data-testid="link-nav-cv">Download CV</a>
           </div>
-        </Section>
+        </nav>
+        {menuOpen && <nav id="mobile-navigation" className="mobile-menu" aria-label="Mobile navigation">
+          {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)} data-testid={`link-mobile-${item.label.toLowerCase()}`}>{item.label}</a>)}
+          <a href={cvPdf} download onClick={() => setMenuOpen(false)} data-testid="link-mobile-cv">Download CV</a>
+        </nav>}
+      </header>
 
-        {/* Skills Section */}
-        <Section title="TECHNICAL ARSENAL" delay={0.3}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <SkillGroup 
-              title="AI-Native Engineering"
-              skills={["Agentic Coding (Claude Code, Cursor)", "Multi-agent workflows", "MCP Tool Servers", "Self-verifying Evals"]}
-            />
-            <SkillGroup 
-              title="LLMs & Applied AI"
-              skills={["Agentic RAG", "Fine-tuning (LoRA/QLoRA)", "GPT / Llama-3 / Qwen", "Prompt Engineering"]}
-            />
-            <SkillGroup 
-              title="Classical ML & Forecasting"
-              skills={["XGBoost / LightGBM / CatBoost", "Amazon Chronos", "Time-series Models", "Anomaly Detection"]}
-            />
-            <SkillGroup 
-              title="Infrastructure & Full-Stack"
-              skills={["Python / SQL / TS / C++", "AWS / Azure", "Docker / Kubernetes", "MLflow / Airflow"]}
-            />
+      <main id="main">
+        <section className="hero" id="top" aria-labelledby="hero-title">
+          <div className="hero-photo" aria-hidden="true"><img src={profilePic} alt="" /></div>
+          <div className="site-wrap">
+            <motion.div initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }} className="hero-topline">
+              <span className="pin" aria-hidden="true" /><span className="eyebrow eyebrow-muted">Principal AI Engineer · Agentic systems, voice & production ML<br />Karachi, Pakistan / working remotely</span>
+            </motion.div>
+            <motion.h1 id="hero-title" className="display" initial={reducedMotion ? false : { opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .9, delay: .1 }}>
+              <span>Intelligence,</span><span><em>in production.</em></span>
+            </motion.h1>
+            <motion.div className="hero-summary" initial={reducedMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .3 }}>
+              <p>I build AI systems that make it past the demo: agentic software, real-time voice, and machine learning engineered to operate in the real world.</p>
+              <a className="text-link" href="#industries" data-testid="link-explore-work">Explore the work <ArrowDown size={16} strokeWidth={1.4} /></a>
+            </motion.div>
+            <div className="hero-footer"><span>Muhammad Abu Bakar / Principal AI Engineer</span><span>Scroll to explore <ArrowDown size={12} /></span></div>
           </div>
-        </Section>
+        </section>
 
-        {/* Education & Achievements */}
-        <Section title="BACKGROUND & IMPACT" delay={0.4}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-2 h-2 bg-foreground inline-block"></span>
-                ACHIEVEMENTS
-              </h3>
-              <ul className="space-y-4 text-sm text-secondary-foreground leading-relaxed font-mono">
-                <li className="p-4 bg-card border border-border"><strong className="text-foreground block mb-1">Kaggle:</strong> 1st place (out of 18k+) in "Predict Future Sales". Silver in GoDaddy Microbusiness Density Forecasting and Learning Agency Lab Essay Scoring.</li>
-                <li className="p-4 bg-card border border-border"><strong className="text-foreground block mb-1">Robotics:</strong> Built an autonomous farming robot via NVIDIA AV research with ~70% edge-detection accuracy.</li>
-                <li className="p-4 bg-card border border-border"><strong className="text-foreground block mb-1">Awards:</strong> NUST High Achievers Award, Afiniti Rising Star Award.</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                <span className="w-2 h-2 bg-foreground inline-block"></span>
-                EDUCATION
-              </h3>
-              <div className="space-y-6">
-                <div className="p-6 bg-card border-2 border-border hover:border-primary transition-colors">
-                  <h4 className="font-bold text-foreground text-lg">Georgia Institute of Technology</h4>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-2">
-                    <p className="text-sm font-mono bg-foreground text-background px-2 py-1 w-fit">MS Computer Science</p>
-                    <p className="text-sm font-mono font-bold text-primary">GPA: 4.00/4.00 • 2024</p>
-                  </div>
-                </div>
-                <div className="p-6 bg-card border-2 border-border hover:border-primary transition-colors">
-                  <h4 className="font-bold text-foreground text-lg">National University of Sciences & Technology</h4>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-2">
-                    <p className="text-sm font-mono bg-foreground text-background px-2 py-1 w-fit">BE Electrical Engineering</p>
-                    <p className="text-sm font-mono font-bold text-primary">GPA: 3.52/4.00 • 2016</p>
-                  </div>
-                </div>
+        <section className="section-block site-wrap" aria-labelledby="profile">
+          <SectionHeading number="01" label="Profile" id="profile" title={<>From model<br /><em>to reality.</em></>} />
+          <div className="section-lead">
+            <div />
+            <div className="section-lead-content">
+              <p><strong>Seven-plus years bridging AI research and production engineering.</strong> I ship agentic systems as software: async-first, high-concurrency, and built to survive beyond the handoff.</p>
+              <p>My work spans regulated enterprise AI, live voice interaction, generative video and forecasting. I take products from architecture through deployment, with the reliability and operational detail that real customers require.</p>
+              <div className="about-aside">
+                <div>Based in<strong>Karachi, Pakistan</strong></div>
+                <div>Focus<strong>Applied AI & systems engineering</strong></div>
+                <div>Credential<strong>Top 3% Toptal talent</strong></div>
               </div>
             </div>
           </div>
-        </Section>
+        </section>
 
-        <footer className="pt-12 pb-6 border-t border-border/50 text-xs text-muted-foreground font-mono flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© {new Date().getFullYear()} Muhammad Abu Bakar. All systems operational.</p>
-          <p>Built with precision engineering.</p>
-        </footer>
+        <section className="section-block site-wrap" aria-labelledby="industries">
+          <SectionHeading number="02" label="Selected domains" id="industries" title={<>Where the work<br /><em>meets the world.</em></>} />
+          <p className="domain-intro">A cross-section of industries where the engineering has had to meet operational reality. Each summary draws from work documented in my CV.</p>
+          <div className="domain-list">
+            {domains.map((domain, index) => (
+              <article className="domain-row" key={domain.title} data-testid={`row-domain-${index + 1}`}>
+                <span className="row-num">{String(index + 1).padStart(2, "0")} /</span>
+                <h3>{domain.title}</h3>
+                <div><span className="eyebrow eyebrow-muted">{domain.context}</span><p>{domain.copy}</p></div>
+                <ArrowUpRight className="row-arrow" size={19} strokeWidth={1.25} aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-block site-wrap" aria-labelledby="career">
+          <SectionHeading number="03" label="Career" id="career" title={<>The path<br /><em>to production.</em></>} />
+          <div className="career-list">
+            {career.map((job, index) => (
+              <article className="career-row" key={job.company} data-testid={`row-career-${index + 1}`}>
+                <span className="row-num">{String(index + 1).padStart(2, "0")} /</span>
+                <div><h3>{job.company}</h3><span className="role">{job.role}</span></div>
+                <p className="career-copy">{job.summary}</p>
+                <div className="period">{job.period}<br />{job.location}</div>
+                <details className="career-detail">
+                  <summary data-testid={`button-expand-career-${index + 1}`}>Read the details</summary>
+                  <ul>{job.details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
+                </details>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-block site-wrap" aria-labelledby="capabilities">
+          <SectionHeading number="04" label="Capabilities" id="capabilities" title={<>Depth where<br /><em>it matters.</em></>} />
+          <div className="capability-grid">
+            {capabilities.map((item, index) => <article className="capability" key={item.title}>
+              <span className="eyebrow">0{index + 1} / Practice area</span>
+              <h3>{item.title}</h3><p>{item.copy}</p>
+            </article>)}
+          </div>
+        </section>
+
+        <section className="section-block site-wrap" aria-labelledby="credentials">
+          <SectionHeading number="05" label="Credentials" id="credentials" title={<>A foundation<br /><em>for the work.</em></>} />
+          <div className="credentials">
+            <article className="credential">
+              <span className="eyebrow">Independent credential / Toptal</span>
+              <h3>Vetted among Toptal's top 3% of talent.</h3>
+              <p>A separate signal of engineering quality, alongside the production work and teams behind it.</p>
+              <a className="text-link" href={toptal} target="_blank" rel="noopener noreferrer" data-testid="link-toptal">View Toptal profile <ArrowUpRight size={15} /></a>
+            </article>
+            <article className="credential">
+              <span className="eyebrow">Recognition / Competitions</span>
+              <h3>From Kaggle to the field.</h3>
+              <p>1st place among 18k+ in Kaggle's “Predict Future Sales”; silver in GoDaddy Microbusiness Density Forecasting and Learning Agency Lab Essay Scoring. NUST High Achievers Award and Afiniti Rising Star Award.</p>
+            </article>
+          </div>
+          <div className="education-list">
+            <div className="education-row"><strong>Georgia Institute of Technology</strong><span>MS Computer Science · GPA 4.00/4.00</span><small>2024</small></div>
+            <div className="education-row"><strong>National University of Sciences & Technology</strong><span>BE Electrical Engineering · GPA 3.52/4.00</span><small>2016</small></div>
+          </div>
+        </section>
+
+        <section className="contact-section" id="contact" aria-labelledby="contact-title">
+          <div className="site-wrap">
+            <span className="eyebrow">06 / Contact</span>
+            <h2 id="contact-title" className="display">Let's build what<br /><em>actually works.</em></h2>
+            <div className="contact-actions">
+              <a className="gold-button" href={email} data-testid="link-email">Start a conversation <ArrowUpRight size={19} strokeWidth={1.4} /></a>
+              <a className="text-link" href={cvPdf} download data-testid="link-download-cv">Download CV <Download size={16} strokeWidth={1.4} /></a>
+            </div>
+            <footer className="footer">
+              <p>© {new Date().getFullYear()} Muhammad Abu Bakar</p>
+              <div className="socials">
+                <a href={linkedIn} target="_blank" rel="noopener noreferrer" data-testid="link-linkedin">LinkedIn ↗</a>
+                <a href={github} target="_blank" rel="noopener noreferrer" data-testid="link-github">GitHub ↗</a>
+                <a href={toptal} target="_blank" rel="noopener noreferrer" data-testid="link-footer-toptal">Toptal ↗</a>
+                <a href={email} data-testid="link-footer-email">Email ↗</a>
+              </div>
+              <a href="#top" data-testid="link-back-top">Back to top <ArrowRight size={12} className="inline" /></a>
+            </footer>
+          </div>
+        </section>
       </main>
-    </div>
-  );
-}
-
-function Section({ title, children, delay }: { title: string; children: ReactNode; delay: number }) {
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="relative"
-    >
-      <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 py-4 mb-8 -mx-6 px-6 md:mx-0 md:px-0 border-b-2 border-foreground md:bg-transparent md:backdrop-blur-none">
-        <h2 className="text-sm font-mono font-bold tracking-widest text-foreground uppercase flex items-center gap-3">
-          <span className="w-3 h-3 bg-primary inline-block" />
-          {title}
-        </h2>
-      </div>
-      {children}
-    </motion.section>
-  );
-}
-
-function ExperienceItem({ 
-  company, 
-  role, 
-  date, 
-  location, 
-  highlights 
-}: { 
-  company: string; 
-  role: string; 
-  date: string; 
-  location: string; 
-  highlights: string[] 
-}) {
-  return (
-    <div className="group relative pl-6 md:pl-0">
-      <div className="absolute left-0 top-2 bottom-0 w-1 bg-border group-hover:bg-primary transition-colors md:hidden" />
-      
-      <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-2 mb-4">
-        <div>
-          <h3 className="text-3xl font-extrabold text-foreground group-hover:text-primary transition-colors">{company}</h3>
-          <p className="text-foreground font-mono text-sm mt-1 uppercase font-bold tracking-tight">{role}</p>
-        </div>
-        <div className="text-left md:text-right font-mono text-sm text-muted-foreground mt-2 md:mt-0">
-          <p className="bg-secondary text-secondary-foreground inline-block px-2 py-0.5 mb-1">{date}</p>
-          <p className="text-xs uppercase tracking-widest">{location}</p>
-        </div>
-      </div>
-      
-      <ul className="space-y-4 mt-6">
-        {highlights.map((highlight, idx) => (
-          <li key={idx} className="text-secondary-foreground text-sm md:text-base leading-relaxed relative pl-5">
-            <span className="absolute left-0 top-2 w-1.5 h-1.5 bg-foreground" />
-            {highlight}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function SkillGroup({ title, skills }: { title: string; skills: string[] }) {
-  return (
-    <div className="bg-card p-6 border-2 border-border hover:border-foreground hover:shadow-[4px_4px_0px_0px_hsl(var(--foreground))] transition-all">
-      <h4 className="font-mono text-sm font-bold text-foreground mb-4 pb-2 border-b-2 border-border uppercase tracking-widest">{title}</h4>
-      <div className="flex flex-wrap gap-2">
-        {skills.map(skill => (
-          <span 
-            key={skill} 
-            className="px-3 py-1 bg-background border border-border text-foreground text-xs font-mono hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors cursor-default"
-          >
-            {skill}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
